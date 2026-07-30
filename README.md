@@ -1,16 +1,21 @@
-# Analytics Pipeline
+# Multi-Container Data Engineering Pipeline: E-Commerce & Exchange Rates ETL
 
-A cross-pipeline data analytics asset that unifies order transaction records with machine learning order value predictions into a central data warehouse table for downstream business intelligence and reporting.
+Multi-container data engineering pipeline yang mengintegrasikan data transaksi e-commerce, nilai tukar mata uang (*FX rates*), serta prediksi Machine Learning menggunakan Dagster framework. Pipeline ini dirancang untuk memproses data penjualan secara otomatis, mengonversi mata uang transaksi, dan memprediksi pendapatan bisnis secara transparan.
 
-Built on top of [dagster-workshop-multi](https://github.com/dagster-workshop/dagster-workshop-multi), a multi-container Dagster workshop — see that repo's README for the base architecture (`pipeline_products`, `pipeline_fx`, `pipeline_ml`).
+Built on top of [dagster-workshop-multi](https://github.com/alifea-design/workshop-dagster), a multi-container Dagster workshop — see that repo's README for the base architecture (`pipeline_products`, `pipeline_fx`, `pipeline_ml`, `pipeline_analytics`).
+
+---
 
 ## What I built
 
-- **Track:** Track B: cross-pipeline analytics
-- **Data source:** Internal PostgreSQL data warehouse populated by `pipeline_products` (`orders` table) and `pipeline_ml` (`order_value_predictions` table).
-- **Key assets:** 
-  - `cross_pipeline_summary`: Performs an inner join between transactional order records and ML model predictions, persisting the consolidated result back into the warehouse.
-- **Quality gate:** 
-  - `check_summary_has_rows`: Verifies that the merged summary table contains at least one row (`row_count > 0`) to prevent downstream reporting issues caused by empty joins or upstream pipeline ingestion failures.
+- **Track:** Cross-pipeline analytics & Multi-container Data Platform
+- **Data source:** Open Exchange Rates API / Historical FX Rates Dataset & Internal E-Commerce Orders
+- **Key assets:**
+  - `raw_exchange_rates`: Mengambil data nilai tukar mata uang harian dari API/sumber FX secara otomatis.
+  - `cleaned_exchange_rates`: Melakukan pembersihan data, normalisasi format tanggal, dan validasi rasio kurs.
+  - `orders_in_eur`: Menggabungkan data order e-commerce dengan data kurs mata uang untuk menghasilkan nominal transaksi standar dalam Euro (EUR).
+- **Quality gate:** Menggunakan `@asset_check` untuk memverifikasi bahwa tidak ada nilai kurs yang bernilai nol atau negatif (`rate > 0`) serta memastikan kolom tanggal tidak mengandung *null values* sebelum proses penggabungan data.
+
+---
 
 ## Architecture
